@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Premium Viral Links</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src='//libtl.com/sdk.js' data-zone='9745051' data-sdk='show_9745051'></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --primary-color: #38bdf8;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-gold: #fbbf24;
+            --success-color: #22c55e;
+            --danger-color: #ef4444;
+            --border-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 90px;
+            font-size: 14px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .app-tab-content {
+            display: none;
+        }
+        .app-tab-content.active {
+            display: block;
+        }
+
+        .profile-header {
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #334155;
+            text-align: center;
+        }
+        .premium-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: linear-gradient(135deg, #e11d48, #f43f5e);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-bottom-left-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .meta-info h1 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            color: var(--primary-color);
+        }
+        .meta-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .search-box-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            border: 1px solid #334155;
+            background: var(--surface-color);
+            color: var(--text-color);
+            outline: none;
+            margin-bottom: 16px;
+        }
+
+        .section-header {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 8px;
+            margin-bottom: 12px;
+            color: var(--primary-color);
+            border-left: 4px solid var(--primary-color);
+            padding-left: 8px;
+        }
+
+        .tasks-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .file-card {
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            padding: 14px;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .file-card-header {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .file-card-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        .file-card-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .file-badge {
+            align-self: flex-start;
+            font-size: 10px;
+            color: var(--primary-color);
+            background: rgba(56, 189, 248, 0.1);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .app-btn {
+            background-color: var(--primary-color);
+            color: #0f172a;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+        }
+        .app-btn.btn-disabled {
+            background-color: #1e293b !important;
+            color: #64748b !important;
+            cursor: not-allowed;
+            pointer-events: none;
+            border: 1px solid #334155;
+        }
+
+        .bottom-tabs-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 70px;
+            background: var(--surface-color);
+            border-top: 1px solid #334155;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 999;
+        }
+        .tab-trigger-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+            gap: 4px;
+        }
+        .tab-trigger-btn.active-tab {
+            color: var(--primary-color);
+        }
+        .tab-trigger-btn svg { width: 22px; height: 22px; fill: currentColor; }
+        .tab-trigger-btn span { font-size: 11px; font-weight: 600; }
+
+        .toast-box-holder {
+            position: fixed;
+            top: 20px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 99999;
+            width: 90%;
+            max-width: 400px;
+        }
+        .toast-msg {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            border: 1px solid #475569;
+            margin-bottom: 8px;
+        }
+
+        .ad-box {
+            background: var(--surface-color);
+            border: 1px dashed #334155;
+            border-radius: var(--border-radius);
+            padding: 8px;
+            margin: 12px 0;
+            text-align: center;
+            min-height: 50px;
+        }
+
+        .earn-card {
+            background: var(--surface-color);
+            border: 1px solid #334155;
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .req-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #334155;
+        }
+        .req-item:last-child { border: none; }
+        .status-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+        .status-success { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .status-pending { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        
+        .form-select, .form-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-box-holder" id="toastBoxHolder"></div>
+
+    <div class="container">
+
+        <div id="tab-home" class="app-tab-content active">
+            <header class="profile-header">
+                <span class="premium-badge">PREMIUM</span>
+                <div class="meta-info">
+                    <h1>PREMIUM VIRAL LINKS</h1>
+                    <p>Ads দেখে ভিডিও আনলক করুন এবং ভিডিওর আসল মজা নিন!</p>
+                </div>
+            </header>
+
+            <div id="ad-container-homepage" class="ad-box"></div>
+
+            <div class="section-header">Latest Uploads</div>
+            <div id="latest-uploads-grid" class="tasks-stack"></div>
+        </div>
+
+        <div id="tab-files" class="app-tab-content">
+            <input type="text" class="search-box-input" id="searchInput" placeholder="ফাইল খুঁজুন..." oninput="handleSearch()">
+            <div class="section-header">Available Files</div>
+            <div id="files-grid" class="tasks-stack"></div>
+            <div id="no-results" style="display: none; text-align: center; padding: 20px;">কোনো ফাইল পাওয়া যায়নি।</div>
+        </div>
+
+        <div id="tab-earn" class="app-tab-content">
+            <div class="profile-header">
+                <h2>Earn Money & Refer</h2>
+                <p>বন্ধুদের রেফার করুন এবং টাস্ক সম্পন্ন করে টাকা তুলুন!</p>
+            </div>
+
+            <div class="earn-card">
+                <h3 style="color: var(--primary-color); margin-bottom: 8px;">আপনার টেলিগ্রাম রেফারেল লিংক</h3>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="refer-link-input" class="form-input" readonly style="margin: 0;">
+                    <button class="app-btn" style="width: auto; padding: 0 16px;" onclick="copyReferLink()">Copy</button>
+                </div>
+                <p style="font-size: 11px; color: var(--danger-color); margin-top: 8px;"><i class="fas fa-exclamation-triangle"></i> একই ডিভাইস থেকে ডুপ্লিকেট রেফার করলে তা কাউন্ট হবে না।</p>
+            </div>
+
+            <div class="earn-card">
+                <h3 style="margin-bottom: 12px; font-size: 15px;">উত্তোলন রিকোয়ারমেন্টস (Withdrawal Requirements)</h3>
+                <div class="req-item">
+                    <span>১. ১০টি সফল রেফারেল:</span>
+                    <span id="req-refer-status" class="status-badge status-pending">0/10</span>
+                </div>
+                <div class="req-item">
+                    <span>২. ২০টি ভিডিও আনলক করা:</span>
+                    <span id="req-video-status" class="status-badge status-pending">0/20</span>
+                </div>
+                <div class="req-item">
+                    <span>৩. ৭ দিন ডেইলি লগইন:</span>
+                    <span id="req-login-status" class="status-badge status-pending">0/7</span>
+                </div>
+            </div>
+
+            <div class="earn-card">
+                <h3 style="margin-bottom: 12px; font-size: 15px;">টাকা উত্তোলন ফর্ম</h3>
+                <select id="withdraw-method" class="form-select">
+                    <option value="Bkash">বিকাশ (Bkash)</option>
+                    <option value="Nagad">নগদ (Nagad)</option>
+                    <option value="Rocket">রকেট (Rocket)</option>
+                </select>
+                <input type="text" id="withdraw-number" class="form-input" placeholder="আপনার একাউন্ট নাম্বার দিন">
+                <input type="number" id="withdraw-amount" class="form-input" placeholder="টাকার পরিমাণ (BDT)">
+                
+                <button id="withdraw-submit-btn" class="app-btn btn-disabled">
+                    <i class="fas fa-lock"></i> রিকোয়ারমেন্ট অপূর্ণ
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <nav class="bottom-tabs-nav">
+        <button class="tab-trigger-btn active-tab" onclick="switchTabs('home', this)">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span>Home</span>
+        </button>
+        <button class="tab-trigger-btn" onclick="switchTabs('files', this)">
+            <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+            <span>Files</span>
+        </button>
+        <button class="tab-trigger-btn" onclick="switchTabs('earn', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+            <span>Earn Money</span>
+        </button>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, addDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsExampleKey-YOUR_ACTUAL_KEY_HERE",
+            authDomain: "admin-panel-demo.firebaseapp.com",
+            projectId: "admin-panel-demo",
+            storageBucket: "admin-panel-demo.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:a1b2c3d4e5f6g7h8i9j0k"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // আপনার বটের ইউজারনেম এখানে দিন (Username-এর আগে @ দেওয়ার প্রয়োজন নেই)
+        const BOT_USERNAME = "YOUR_BOT_USERNAME"; 
+
+        let timerDuration = 10;
+        let directAdUrl = ""; 
+        let allFilesData = [];
+        let userStats = { refs: 0, unlocks: 0, logins: 1 };
+        let userId = "";
+
+        async function initUser() {
+            userId = localStorage.getItem('app_user_id');
+            
+            // ১. ডিভাইস আইডেন্টিফায়িং ফিঙ্গারপ্রিন্ট জেনারেটর (ফেক রেফারেল আটকানোর মূল মেকানিজম)
+            let deviceFingerprint = localStorage.getItem('app_device_fingerprint');
+            if (!deviceFingerprint) {
+                deviceFingerprint = 'dev_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+                localStorage.setItem('app_device_fingerprint', deviceFingerprint);
+            }
+
+            if (!userId) {
+                userId = 'usr_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('app_user_id', userId);
+            }
+
+            // ২. টেলিগ্রাম মিনি অ্যাপের স্টার্ট প্যারামিটার থেকে রেফারার আইডি রিড করা 
+            const urlParams = new URLSearchParams(window.location.search);
+            let refBy = urlParams.get('tgWebAppStartParam'); 
+            if (refBy && refBy.startsWith('ref_')) {
+                refBy = refBy.replace('ref_', '');
+            }
+
+            const userDocRef = doc(db, "users", userId);
+            const userDoc = await getDoc(userDocRef);
+
+            if (!userDoc.exists()) {
+                // নতুন ইউজারের ডেটা ডাটাবেজে সেভ হচ্ছে
+                let data = { 
+                    id: userId, 
+                    refCount: 0, 
+                    videoUnlocks: 0, 
+                    dailyLogins: 1, 
+                    device_fingerprint: deviceFingerprint, 
+                    lastLoginDate: new Date().toDateString() 
+                };
+                await setDoc(userDocRef, data);
+
+                // ৩. সফল রেফারেল ভ্যালিডেশন চেকিং লজিক
+                if (refBy && refBy !== userId) {
+                    
+                    // চেক করা হচ্ছে এই ডিভাইসটি দিয়ে আগে কোনো ইউজার এই মিনি অ্যাপে ঢুকেছে কিনা
+                    const usersRef = collection(db, "users");
+                    const q = query(usersRef, where("device_fingerprint", "==", deviceFingerprint));
+                    const querySnapshot = await getDocs(q);
+                    
+                    let isDuplicateDevice = false;
+                    querySnapshot.forEach((doc) => {
+                        if (doc.id !== userId) {
+                            isDuplicateDevice = true; 
+                        }
+                    });
+
+                    // ডিভাইস ইউনিক হলেই কেবল রেফারেল সফল কাউন্ট হবে
+                    if (!isDuplicateDevice) {
+                        const refTargetRef = doc(db, "users", refBy);
+                        const refTargetDoc = await getDoc(refTargetRef);
+                        if (refTargetDoc.exists()) {
+                            let currentRefCount = refTargetDoc.data().refCount || 0;
+                            await setDoc(refTargetRef, { refCount: currentRefCount + 1 }, { merge: true });
+                            
+                            // রেফারেল লগ ডাটাবেজে যুক্ত করা
+                            await addDoc(collection(db, "referrals"), {
+                                referrer_id: refBy,
+                                referred_user_id: userId,
+                                status: "Success",
+                                createdAt: new Date()
+                            });
+                        }
+                    } else {
+                        // ডুপ্লিকেট ডিভাইস ট্র্যাকিং লগ
+                        await addDoc(collection(db, "referrals"), {
+                            referrer_id: refBy,
+                            referred_user_id: userId,
+                            status: "Rejected (Duplicate Device)",
+                            createdAt: new Date()
+                        });
+                        console.log("রেফারেল কাউন্ট করা হয়নি: ডুপ্লিকেট ডিভাইস সনাক্ত হয়েছে।");
+                    }
+                }
+            } else {
+                let userData = userDoc.data();
+                let today = new Date().toDateString();
+                if (userData.lastLoginDate !== today) {
+                    let updatedLogins = (userData.dailyLogins || 0) + 1;
+                    await setDoc(userDocRef, { dailyLogins: updatedLogins, lastLoginDate: today }, { merge: true });
+                }
+            }
+
+            // ৪. অটোমেটিক টেলিগ্রাম মিনি বট রেফারেল লিংক জেনারেশন
+            document.getElementById('refer-link-input').value = `https://t.me/${BOT_USERNAME}?start=ref_${userId}`;
+            loadUserStats();
+        }
+
+        async function loadUserStats() {
+            const userDoc = await getDoc(doc(db, "users", userId));
+            if (userDoc.exists()) {
+                const d = userDoc.data();
+                userStats.refs = d.refCount || 0;
+                userStats.unlocks = d.videoUnlocks || 0;
+                userStats.logins = d.dailyLogins || 0;
+
+                updateRequirementUI('req-refer-status', userStats.refs, 10);
+                updateRequirementUI('req-video-status', userStats.unlocks, 20);
+                updateRequirementUI('req-login-status', userStats.logins, 7);
+
+                if (userStats.refs >= 10 && userStats.unlocks >= 20 && userStats.logins >= 7) {
+                    const btn = document.getElementById('withdraw-submit-btn');
+                    btn.classList.remove('btn-disabled');
+                    btn.style.backgroundColor = "var(--success-color)";
+                    btn.innerHTML = `<i class="fas fa-check-circle"></i> টাকা উত্তোলন করুন`;
+                    btn.onclick = processWithdrawal;
+                }
+            }
+        }
+
+        function updateRequirementUI(elementId, current, target) {
+            const el = document.getElementById(elementId);
+            el.textContent = `${current}/${target}`;
+            if (current >= target) {
+                el.className = "status-badge status-success";
+            } else {
+                el.className = "status-badge status-pending";
+            }
+        }
+
+        async function processWithdrawal() {
+            const method = document.getElementById('withdraw-method').value;
+            const number = document.getElementById('withdraw-number').value.trim();
+            const amount = document.getElementById('withdraw-amount').value.trim();
+
+            if (!number || !amount) {
+                alert("সবগুলো ফিল্ড সঠিকভাবে পূরণ করুন!");
+                return;
+            }
+
+            await addDoc(collection(db, "withdrawals"), {
+                userId, method, number, amount, status: "Pending", createdAt: new Date()
+            });
+
+            showCustomToast("উত্তোলন রিকোয়েস্ট সফলভাবে পাঠানো হয়েছে!");
+            document.getElementById('withdraw-number').value = "";
+            document.getElementById('withdraw-amount').value = "";
+        }
+
+        window.copyReferLink = function() {
+            const copyText = document.getElementById("refer-link-input");
+            copyText.select();
+            document.execCommand("copy");
+            showCustomToast("টেলিগ্রাম রেফার লিংক কপি হয়েছে!");
+        }
+
+        window.switchTabs = function(targetId, btn) {
+            document.querySelectorAll('.app-tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-trigger-btn').forEach(el => el.classList.remove('active-tab'));
+            document.getElementById(`tab-${targetId}`).classList.add('active');
+            if (btn) btn.classList.add('active-tab');
+        }
+
+        function showCustomToast(msg) {
+            const holder = document.getElementById('toastBoxHolder');
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg';
+            toast.textContent = msg;
+            holder.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        async function loadAppData() {
+            const timerDoc = await getDoc(doc(db, "settings", "general"));
+            if (timerDoc.exists()) {
+                timerDuration = timerDoc.data().timerDuration || 10;
+                directAdUrl = timerDoc.data().directAdUrl || ""; 
+            }
+
+            const adsDoc = await getDoc(doc(db, "settings", "ads"));
+            if (adsDoc.exists() && adsDoc.data().adSlot1) {
+                document.getElementById('ad-container-homepage').innerHTML = adsDoc.data().adSlot1;
+            }
+
+            const filesQuery = query(collection(db, "files"), orderBy("createdAt", "desc"));
+            const snap = await getDocs(filesQuery);
+            allFilesData = [];
+            snap.forEach(d => allFilesData.push({ id: d.id, ...d.data() }));
+
+            renderFilesGrid(allFilesData.slice(0, 5), 'latest-uploads-grid');
+            renderFilesGrid(allFilesData, 'files-grid');
+        }
+
+        function renderFilesGrid(files, elementId) {
+            const grid = document.getElementById(elementId);
+            grid.innerHTML = '';
+            files.forEach(file => {
+                const required = file.requiredAds || 1;
+                const card = document.createElement('div');
+                card.className = 'file-card';
+                card.innerHTML = `
+                    <div class="file-card-header">
+                        <div class="file-card-info">
+                            <img src="${file.thumbnailUrl || ''}" style="width:100%; height:130px; object-fit:cover; border-radius:8px; margin-bottom:8px;">
+                            <h4>${file.title || 'Untitled'}</h4>
+                            <p>${file.description || ''}</p>
+                        </div>
+                        <span class="file-badge">Required Ads: ${required}</span>
+                    </div>
+                    <button class="app-btn unlock-btn" data-id="${file.id}">
+                        <i class="fas fa-lock"></i> Unlock (0/${required})
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.handleSearch = function() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allFilesData.filter(f => f.title.toLowerCase().includes(term));
+            renderFilesGrid(filtered, 'files-grid');
+            document.getElementById('no-results').style.display = filtered.length === 0 ? 'block' : 'none';
+        }
+
+        async function handleUnlockClick(e) {
+            const btn = e.target.closest('.unlock-btn');
+            if (!btn) return;
+
+            const fileId = btn.dataset.id;
+            const file = allFilesData.find(f => f.id === fileId);
+            if (!file) return;
+
+            btn.classList.add('btn-disabled');
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading Ad...`;
+
+            if (directAdUrl && directAdUrl.trim() !== "") {
+                window.open(directAdUrl, '_blank');
+            } else {
+                window.open('https://www.google.com', '_blank'); 
+            }
+
+            let countdown = timerDuration;
+            btn.innerHTML = `<i class="fas fa-clock"></i> Please wait ${countdown}s`;
+            
+            const interval = setInterval(async () => {
+                countdown--;
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    
+                    let sessionKey = `file_ads_${file.id}`;
+                    let currentCount = parseInt(sessionStorage.getItem(sessionKey) || '0') + 1;
+                    sessionStorage.setItem(sessionKey, currentCount);
+
+                    const required = file.requiredAds || 1;
+                    if (currentCount >= required) {
+                        btn.className = "app-btn";
+                        btn.style.backgroundColor = "var(--success-color)";
+                        btn.classList.remove('btn-disabled');
+                        btn.innerHTML = `<i class="fas fa-download"></i> Download Now`;
+                        btn.onclick = () => window.open(file.downloadUrl, '_blank');
+                        
+                        const userDocRef = doc(db, "users", userId);
+                        userStats.unlocks += 1;
+                        await setDoc(userDocRef, { videoUnlocks: userStats.unlocks }, { merge: true });
+                        loadUserStats();
+                    } else {
+                        btn.classList.remove('btn-disabled');
+                        btn.innerHTML = `<i class="fas fa-lock"></i> Unlock (${currentCount}/${required})`;
+                    }
+                } else {
+                    btn.innerHTML = `<i class="fas fa-clock"></i> Please wait ${countdown}s`;
+                }
+            }, 1000);
+        }
+
+        window.addEventListener('load', () => {
+            initUser();
+            loadAppData();
+        });
+        document.getElementById('latest-uploads-grid').addEventListener('click', handleUnlockClick);
+        document.getElementById('files-grid').addEventListener('click', handleUnlockClick);
+    </script>
+</body>
+</html>
