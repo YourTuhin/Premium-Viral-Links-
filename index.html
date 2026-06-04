@@ -108,6 +108,7 @@
             padding-left: 8px;
         }
 
+        /* 🌟 স্ক্রিনশটের মতো রো (Row) লেআউট */
         .tasks-stack {
             display: flex;
             flex-direction: column;
@@ -116,41 +117,60 @@
         .file-card {
             background: var(--surface-color);
             border-radius: var(--border-radius);
-            padding: 14px;
+            padding: 12px;
             border: 1px solid #334155;
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
         }
-        .file-card-header {
+        .file-thumb-container {
+            flex-shrink: 0;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .file-thumb-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .file-card-content {
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             gap: 6px;
+            min-width: 0;
         }
         .file-card-info h4 {
             font-size: 14px;
             font-weight: 600;
             color: var(--text-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .file-card-info p {
             font-size: 12px;
             color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .file-badge {
-            align-self: flex-start;
-            font-size: 10px;
-            color: var(--primary-color);
-            background: rgba(56, 189, 248, 0.1);
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-weight: 700;
+        .file-action-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
         }
 
         .app-btn {
             background-color: var(--primary-color);
             color: #0f172a;
             border: none;
-            padding: 12px;
+            padding: 10px 14px;
             border-radius: 12px;
             font-size: 13px;
             font-weight: 700;
@@ -160,7 +180,7 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            width: 100%;
+            flex-grow: 1;
         }
         .app-btn.btn-disabled {
             background-color: #1e293b !important;
@@ -168,6 +188,21 @@
             cursor: not-allowed;
             pointer-events: none;
             border: 1px solid #334155;
+        }
+        
+        .share-circle-btn {
+            background: #e2e8f0;
+            color: #2563eb;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            flex-shrink: 0;
         }
 
         .bottom-tabs-nav {
@@ -258,6 +293,16 @@
             border: 1px solid #334155;
             color: white;
             margin-bottom: 12px;
+            outline: none;
+        }
+
+        .balance-gradient-box {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -295,28 +340,37 @@
                 <p>বন্ধুদের রেফার করুন এবং টাস্ক সম্পন্ন করে টাকা তুলুন!</p>
             </div>
 
+            <div class="balance-gradient-box">
+                <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">Current Balance (বর্তমান ব্যালেন্স)</p>
+                <p style="font-size: 38px; font-weight: 900; margin-top: 4px;">৳ <span id="user-balance-display">0.00</span></p>
+            </div>
+
             <div class="earn-card">
                 <h3 style="color: var(--primary-color); margin-bottom: 8px;">আপনার টেলিগ্রাম রেফারেল লিংক</h3>
                 <div style="display: flex; gap: 8px;">
                     <input type="text" id="refer-link-input" class="form-input" readonly style="margin: 0;">
                     <button class="app-btn" style="width: auto; padding: 0 16px;" onclick="copyReferLink()">Copy</button>
                 </div>
-                <p style="font-size: 11px; color: var(--danger-color); margin-top: 8px;"><i class="fas fa-exclamation-triangle"></i> একই ডিভাইস থেকে ডুপ্লিকেট রেফার করলে তা কাউন্ট হবে না।</p>
+                <p style="font-size: 11px; color: var(--danger-color); margin-top: 8px;"><i class="fas fa-exclamation-triangle"></i> প্রতি সফল রেফারে পাবেন ৳২০। একই ডিভাইস থেকে ডুপ্লিকেট রেফার করলে কাউন্ট হবে না।</p>
             </div>
 
             <div class="earn-card">
                 <h3 style="margin-bottom: 12px; font-size: 15px;">উত্তোলন রিকোয়ারমেন্টস (Withdrawal Requirements)</h3>
                 <div class="req-item">
-                    <span>১. ১০টি সফল রেফারেল:</span>
-                    <span id="req-refer-status" class="status-badge status-pending">0/10</span>
+                    <span>১. মোট সফল রেফারেল (মিনিমাম ১):</span>
+                    <span id="req-refer-status" class="status-badge status-pending">0</span>
                 </div>
                 <div class="req-item">
-                    <span>২. ২০টি ভিডিও আনলক করা:</span>
-                    <span id="req-video-status" class="status-badge status-pending">0/20</span>
+                    <span>২. মোট উপার্জিত ব্যালেন্স (মিনিমাম ৳২০০):</span>
+                    <span id="req-balance-status" class="status-badge status-pending">৳০/৳২০০</span>
                 </div>
                 <div class="req-item">
-                    <span>৩. ৭ দিন ডেইলি লগইন:</span>
-                    <span id="req-login-status" class="status-badge status-pending">0/7</span>
+                    <span>৩. ডেইলি লগইন টাস্ক (মিনিমাম ৭ দিন):</span>
+                    <span id="req-login-status" class="status-badge status-pending">০/৭ দিন</span>
+                </div>
+                <div class="req-item">
+                    <span>৪. প্রতিদিন ভিডিও আনলক টাস্ক (মিনিমাম ৫টি):</span>
+                    <span id="req-unlock-status" class="status-badge status-pending">০/৫টি</span>
                 </div>
             </div>
 
@@ -328,7 +382,7 @@
                     <option value="Rocket">রকেট (Rocket)</option>
                 </select>
                 <input type="text" id="withdraw-number" class="form-input" placeholder="আপনার একাউন্ট নাম্বার দিন">
-                <input type="number" id="withdraw-amount" class="form-input" placeholder="টাকার পরিমাণ (BDT)">
+                <input type="number" id="withdraw-amount" class="form-input" placeholder="টাকার পরিমাণ (মিনিমাম ২০০)">
                 
                 <button id="withdraw-submit-btn" class="app-btn btn-disabled">
                     <i class="fas fa-lock"></i> রিকোয়ারমেন্ট অপূর্ণ
@@ -357,6 +411,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, setDoc, addDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        // ⚠️ আপনার ফায়ারবেস কনফিগারেশন এখানে বসাবেন
         const firebaseConfig = {
   apiKey: "AIzaSyDLEr3ulwZgDhb-oJF1h8cG87MAdPeHrLA",
   authDomain: "premium-viral-links.firebaseapp.com",
@@ -364,25 +419,48 @@
   projectId: "premium-viral-links",
   storageBucket: "premium-viral-links.firebasestorage.app",
   messagingSenderId: "283291795982",
-  appId: "1:283291795982:web:50d17b00baa84d6271f25f"
+  appId: "1:283291795982:web:8c534bab5cdb6db571f25f"
 };
         
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // আপনার বটের ইউজারনেম এখানে দিন (Username-এর আগে @ দেওয়ার প্রয়োজন নেই)
+        // ⚠️ বটের ইউজারনেম (@ ছাড়া)
         const BOT_USERNAME = "Premium_Viral_Links_bot"; 
 
         let timerDuration = 10;
         let directAdUrl = ""; 
         let allFilesData = [];
-        let userStats = { refs: 0, unlocks: 0, logins: 1 };
+        let calculatedBalance = 0;
         let userId = "";
+
+        // ১ ঘণ্টার লক স্টোরেজ হেল্পার ফাংশন
+        function getFileData(fileId) {
+            let key = `file_ad_data_${fileId}`;
+            let stored = localStorage.getItem(key);
+            if (!stored) return { count: 0, unlockTime: null };
+            
+            try {
+                let parsed = JSON.parse(stored);
+                // ১ ঘণ্টা = ৩৬০০০০০ মিলিসেকেন্ড পার হলে ডাটা রিসেট
+                if (parsed.unlockTime && (Date.now() - parsed.unlockTime > 3600000)) {
+                    localStorage.removeItem(key);
+                    return { count: 0, unlockTime: null };
+                }
+                return parsed;
+            } catch(e) {
+                return { count: 0, unlockTime: null };
+            }
+        }
+
+        function setFileData(fileId, count, unlockTime = null) {
+            let key = `file_ad_data_${fileId}`;
+            localStorage.setItem(key, JSON.stringify({ count, unlockTime }));
+        }
 
         async function initUser() {
             userId = localStorage.getItem('app_user_id');
             
-            // ১. ডিভাইস আইডেন্টিফায়িং ফিঙ্গারপ্রিন্ট জেনারেটর (ফেক রেফারেল আটকানোর মূল মেকানিজম)
             let deviceFingerprint = localStorage.getItem('app_device_fingerprint');
             if (!deviceFingerprint) {
                 deviceFingerprint = 'dev_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
@@ -394,7 +472,6 @@
                 localStorage.setItem('app_user_id', userId);
             }
 
-            // ২. টেলিগ্রাম মিনি অ্যাপের স্টার্ট প্যারামিটার থেকে রেফারার আইডি রিড করা 
             const urlParams = new URLSearchParams(window.location.search);
             let refBy = urlParams.get('tgWebAppStartParam'); 
             if (refBy && refBy.startsWith('ref_')) {
@@ -403,35 +480,31 @@
 
             const userDocRef = doc(db, "users", userId);
             const userDoc = await getDoc(userDocRef);
+            let today = new Date().toDateString();
 
             if (!userDoc.exists()) {
-                // নতুন ইউজারের ডেটা ডাটাবেজে সেভ হচ্ছে
                 let data = { 
                     id: userId, 
                     refCount: 0, 
                     videoUnlocks: 0, 
                     dailyLogins: 1, 
                     device_fingerprint: deviceFingerprint, 
-                    lastLoginDate: new Date().toDateString() 
+                    lastLoginDate: today,
+                    lastUnlockDate: today,
+                    todayUnlocksCount: 0
                 };
                 await setDoc(userDocRef, data);
 
-                // ৩. সফল রেফারেল ভ্যালিডেশন চেকিং লজিক
                 if (refBy && refBy !== userId) {
-                    
-                    // চেক করা হচ্ছে এই ডিভাইসটি দিয়ে আগে কোনো ইউজার এই মিনি অ্যাপে ঢুকেছে কিনা
                     const usersRef = collection(db, "users");
                     const q = query(usersRef, where("device_fingerprint", "==", deviceFingerprint));
                     const querySnapshot = await getDocs(q);
                     
                     let isDuplicateDevice = false;
                     querySnapshot.forEach((doc) => {
-                        if (doc.id !== userId) {
-                            isDuplicateDevice = true; 
-                        }
+                        if (doc.id !== userId) isDuplicateDevice = true; 
                     });
 
-                    // ডিভাইস ইউনিক হলেই কেবল রেফারেল সফল কাউন্ট হবে
                     if (!isDuplicateDevice) {
                         const refTargetRef = doc(db, "users", refBy);
                         const refTargetDoc = await getDoc(refTargetRef);
@@ -439,7 +512,6 @@
                             let currentRefCount = refTargetDoc.data().refCount || 0;
                             await setDoc(refTargetRef, { refCount: currentRefCount + 1 }, { merge: true });
                             
-                            // রেফারেল লগ ডাটাবেজে যুক্ত করা
                             await addDoc(collection(db, "referrals"), {
                                 referrer_id: refBy,
                                 referred_user_id: userId,
@@ -448,26 +520,32 @@
                             });
                         }
                     } else {
-                        // ডুপ্লিকেট ডিভাইস ট্র্যাকিং লগ
                         await addDoc(collection(db, "referrals"), {
                             referrer_id: refBy,
                             referred_user_id: userId,
                             status: "Rejected (Duplicate Device)",
                             createdAt: new Date()
                         });
-                        console.log("রেফারেল কাউন্ট করা হয়নি: ডুপ্লিকেট ডিভাইস সনাক্ত হয়েছে।");
                     }
                 }
             } else {
                 let userData = userDoc.data();
-                let today = new Date().toDateString();
+                let updateData = {};
+                
                 if (userData.lastLoginDate !== today) {
-                    let updatedLogins = (userData.dailyLogins || 0) + 1;
-                    await setDoc(userDocRef, { dailyLogins: updatedLogins, lastLoginDate: today }, { merge: true });
+                    updateData.dailyLogins = (userData.dailyLogins || 0) + 1;
+                    updateData.lastLoginDate = today;
+                }
+                if (userData.lastUnlockDate !== today) {
+                    updateData.todayUnlocksCount = 0;
+                    updateData.lastUnlockDate = today;
+                }
+                
+                if(Object.keys(updateData).length > 0) {
+                    await setDoc(userDocRef, updateData, { merge: true });
                 }
             }
 
-            // ৪. অটোমেটিক টেলিগ্রাম মিনি বট রেফারেল লিংক জেনারেশন
             document.getElementById('refer-link-input').value = `https://t.me/${BOT_USERNAME}?start=ref_${userId}`;
             loadUserStats();
         }
@@ -476,43 +554,75 @@
             const userDoc = await getDoc(doc(db, "users", userId));
             if (userDoc.exists()) {
                 const d = userDoc.data();
-                userStats.refs = d.refCount || 0;
-                userStats.unlocks = d.videoUnlocks || 0;
-                userStats.logins = d.dailyLogins || 0;
+                const totalRefs = d.refCount || 0;
+                const dailyLoginsCount = d.dailyLogins || 1;
+                const todayUnlocks = d.todayUnlocksCount || 0;
+                
+                calculatedBalance = totalRefs * 20;
+                document.getElementById('user-balance-display').textContent = calculatedBalance.toFixed(2);
+                
+                // ১. রেফারেল স্ট্যাটাস
+                const refStatusEl = document.getElementById('req-refer-status');
+                refStatusEl.textContent = `${totalRefs} টি সফল রেফার`;
+                let isRefOk = totalRefs >= 1;
+                refStatusEl.className = isRefOk ? "status-badge status-success" : "status-badge status-pending";
 
-                updateRequirementUI('req-refer-status', userStats.refs, 10);
-                updateRequirementUI('req-video-status', userStats.unlocks, 20);
-                updateRequirementUI('req-login-status', userStats.logins, 7);
+                // ২. ব্যালেন্স স্ট্যাটাস
+                const balStatusEl = document.getElementById('req-balance-status');
+                balStatusEl.textContent = `৳${calculatedBalance}/৳২০০`;
+                let isBalOk = calculatedBalance >= 200;
+                balStatusEl.className = isBalOk ? "status-badge status-success" : "status-badge status-pending";
 
-                if (userStats.refs >= 10 && userStats.unlocks >= 20 && userStats.logins >= 7) {
+                // ৩. ডেইলি লগইন স্ট্যাটাস (৭ দিন)
+                const loginStatusEl = document.getElementById('req-login-status');
+                loginStatusEl.textContent = `${dailyLoginsCount}/৭ দিন`;
+                let isLoginOk = dailyLoginsCount >= 7;
+                loginStatusEl.className = isLoginOk ? "status-badge status-success" : "status-badge status-pending";
+
+                // ৪. প্রতিদিন ভিডিও আনলক স্ট্যাটাস (৫টি)
+                const unlockStatusEl = document.getElementById('req-unlock-status');
+                unlockStatusEl.textContent = `${todayUnlocks}/৫টি`;
+                let isUnlockOk = todayUnlocks >= 5;
+                unlockStatusEl.className = isUnlockOk ? "status-badge status-success" : "status-badge status-pending";
+
+                // সব রিকোয়ারমেন্ট চেক
+                if (isRefOk && isBalOk && isLoginOk && isUnlockOk) {
                     const btn = document.getElementById('withdraw-submit-btn');
                     btn.classList.remove('btn-disabled');
                     btn.style.backgroundColor = "var(--success-color)";
                     btn.innerHTML = `<i class="fas fa-check-circle"></i> টাকা উত্তোলন করুন`;
                     btn.onclick = processWithdrawal;
+                } else {
+                    const btn = document.getElementById('withdraw-submit-btn');
+                    btn.classList.add('btn-disabled');
+                    btn.style.backgroundColor = "";
+                    btn.innerHTML = `<i class="fas fa-lock"></i> রিকোয়ারমেন্ট অপূর্ণ`;
+                    btn.onclick = null;
                 }
-            }
-        }
-
-        function updateRequirementUI(elementId, current, target) {
-            const el = document.getElementById(elementId);
-            el.textContent = `${current}/${target}`;
-            if (current >= target) {
-                el.className = "status-badge status-success";
-            } else {
-                el.className = "status-badge status-pending";
             }
         }
 
         async function processWithdrawal() {
             const method = document.getElementById('withdraw-method').value;
             const number = document.getElementById('withdraw-number').value.trim();
-            const amount = document.getElementById('withdraw-amount').value.trim();
+            const amount = parseInt(document.getElementById('withdraw-amount').value.trim());
 
             if (!number || !amount) {
                 alert("সবগুলো ফিল্ড সঠিকভাবে পূরণ করুন!");
                 return;
             }
+            if (amount < 200) {
+                alert("দুঃখিত, মিনিমাম উইথড্র ২০০ টাকা হতে হবে!");
+                return;
+            }
+            if (amount > calculatedBalance) {
+                alert(`আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই! বর্তমান ব্যালেন্স: ৳${calculatedBalance}`);
+                return;
+            }
+
+            const btn = document.getElementById('withdraw-submit-btn');
+            btn.classList.add('btn-disabled');
+            btn.innerText = "Processing...";
 
             await addDoc(collection(db, "withdrawals"), {
                 userId, method, number, amount, status: "Pending", createdAt: new Date()
@@ -521,6 +631,7 @@
             showCustomToast("উত্তোলন রিকোয়েস্ট সফলভাবে পাঠানো হয়েছে!");
             document.getElementById('withdraw-number').value = "";
             document.getElementById('withdraw-amount').value = "";
+            loadUserStats();
         }
 
         window.copyReferLink = function() {
@@ -528,6 +639,12 @@
             copyText.select();
             document.execCommand("copy");
             showCustomToast("টেলিগ্রাম রেফার লিংক কপি হয়েছে!");
+        }
+
+        window.shareSingleLink = function(title, fileId) {
+            const shareUrl = `https://t.me/${BOT_USERNAME}?start=file_${fileId}`;
+            const text = encodeURIComponent(`🔥 ${title}\n\nভিডিওটি দেখতে নিচের লিংকে ক্লিক করুন 👇\n`);
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${text}`, '_blank');
         }
 
         window.switchTabs = function(targetId, btn) {
@@ -567,25 +684,41 @@
             renderFilesGrid(allFilesData, 'files-grid');
         }
 
+        // 🌟 স্ক্রিনশটের অনুকরণে রো ভিত্তিক গ্রিড মেকার
         function renderFilesGrid(files, elementId) {
             const grid = document.getElementById(elementId);
             grid.innerHTML = '';
             files.forEach(file => {
                 const required = file.requiredAds || 1;
+                let adData = getFileData(file.id);
+                let currentCount = adData.count;
+                
                 const card = document.createElement('div');
                 card.className = 'file-card';
+                
+                let buttonHtml = '';
+                if (currentCount >= required && adData.unlockTime && (Date.now() - adData.unlockTime < 3600000)) {
+                    buttonHtml = `<button class="app-btn" style="background-color: var(--success-color);" onclick="window.open('${file.downloadUrl}', '_blank')"><i class="fas fa-download"></i> Download</button>`;
+                } else {
+                    buttonHtml = `<button class="app-btn unlock-btn" data-id="${file.id}"><i class="fas fa-lock"></i> Unlock (${currentCount}/${required})</button>`;
+                }
+
                 card.innerHTML = `
-                    <div class="file-card-header">
-                        <div class="file-card-info">
-                            <img src="${file.thumbnailUrl || ''}" style="width:100%; height:130px; object-fit:cover; border-radius:8px; margin-bottom:8px;">
-                            <h4>${file.title || 'Untitled'}</h4>
-                            <p>${file.description || ''}</p>
-                        </div>
-                        <span class="file-badge">Required Ads: ${required}</span>
+                    <div class="file-thumb-container">
+                        <img src="${file.thumbnailUrl || 'https://via.placeholder.com/80'}" alt="thumbnail">
                     </div>
-                    <button class="app-btn unlock-btn" data-id="${file.id}">
-                        <i class="fas fa-lock"></i> Unlock (0/${required})
-                    </button>
+                    <div class="file-card-content">
+                        <div class="file-card-info">
+                            <h4>${file.title || 'Untitled'}</h4>
+                            <p>${file.description || 'কোনো ডেসক্রিপশন নেই'}</p>
+                        </div>
+                        <div class="file-action-area">
+                            ${buttonHtml}
+                            <button class="share-circle-btn" onclick="shareSingleLink('${file.title.replace(/'/g, "\\'")}', '${file.id}')">
+                                <i class="fas fa-share"></i>
+                            </button>
+                        </div>
+                    </div>
                 `;
                 grid.appendChild(card);
             });
@@ -607,7 +740,7 @@
             if (!file) return;
 
             btn.classList.add('btn-disabled');
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading Ad...`;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Load Ad`;
 
             if (directAdUrl && directAdUrl.trim() !== "") {
                 window.open(directAdUrl, '_blank');
@@ -616,35 +749,65 @@
             }
 
             let countdown = timerDuration;
-            btn.innerHTML = `<i class="fas fa-clock"></i> Please wait ${countdown}s`;
+            btn.innerHTML = `<i class="fas fa-clock"></i> Wait ${countdown}s`;
             
             const interval = setInterval(async () => {
                 countdown--;
-                if (countdown <= 0) {
+                if (countdown > 0) {
+                    btn.innerHTML = `<i class="fas fa-clock"></i> Wait ${countdown}s`;
+                } else {
                     clearInterval(interval);
                     
-                    let sessionKey = `file_ads_${file.id}`;
-                    let currentCount = parseInt(sessionStorage.getItem(sessionKey) || '0') + 1;
-                    sessionStorage.setItem(sessionKey, currentCount);
-
+                    let adData = getFileData(file.id);
+                    let currentCount = adData.count + 1;
                     const required = file.requiredAds || 1;
+
+                    let unlockTime = null;
                     if (currentCount >= required) {
-                        btn.className = "app-btn";
-                        btn.style.backgroundColor = "var(--success-color)";
-                        btn.classList.remove('btn-disabled');
-                        btn.innerHTML = `<i class="fas fa-download"></i> Download Now`;
-                        btn.onclick = () => window.open(file.downloadUrl, '_blank');
+                        unlockTime = Date.now();
+                    }
+                    
+                    setFileData(file.id, currentCount, unlockTime);
+                    const allSameFileButtons = document.querySelectorAll(`.unlock-btn[data-id="${fileId}"]`);
+
+                    if (currentCount >= required) {
+                        allSameFileButtons.forEach(button => {
+                            // বাটন ইন্টারফেস সাথে সাথে আপডেট
+                            const container = button.parentElement;
+                            if(container) {
+                                button.remove();
+                                const newBtn = document.createElement('button');
+                                newBtn.className = "app-btn";
+                                newBtn.style.backgroundColor = "var(--success-color)";
+                                newBtn.innerHTML = `<i class="fas fa-download"></i> Download`;
+                                newBtn.onclick = () => window.open(file.downloadUrl, '_blank');
+                                container.insertBefore(newBtn, container.firstChild);
+                            }
+                        });
                         
+                        // ফায়ারবেস ডেটাতে ডেইলি টাস্ক কাউন্ট আপডেট
                         const userDocRef = doc(db, "users", userId);
-                        userStats.unlocks += 1;
-                        await setDoc(userDocRef, { videoUnlocks: userStats.unlocks }, { merge: true });
+                        let freshUserDoc = await getDoc(userDocRef);
+                        let today = new Date().toDateString();
+                        
+                        if(freshUserDoc.exists()) {
+                            let uData = freshUserDoc.data();
+                            let totalUnlocks = (uData.videoUnlocks || 0) + 1;
+                            let tUnlocksCount = uData.lastUnlockDate === today ? (uData.todayUnlocksCount || 0) + 1 : 1;
+                            
+                            await setDoc(userDocRef, { 
+                                videoUnlocks: totalUnlocks,
+                                todayUnlocksCount: tUnlocksCount,
+                                lastUnlockDate: today
+                            }, { merge: true });
+                        }
                         loadUserStats();
                     } else {
-                        btn.classList.remove('btn-disabled');
-                        btn.innerHTML = `<i class="fas fa-lock"></i> Unlock (${currentCount}/${required})`;
+                        allSameFileButtons.forEach(button => {
+                            button.classList.remove('btn-disabled');
+                            button.innerHTML = `<i class="fas fa-lock"></i> Unlock (${currentCount}/${required})`;
+                        });
                     }
-                } else {
-                    btn.innerHTML = `<i class="fas fa-clock"></i> Please wait ${countdown}s`;
                 }
             }, 1000);
         }
