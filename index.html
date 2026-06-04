@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Premium Viral Links</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src='//libtl.com/sdk.js' data-zone='9745051' data-sdk='show_9745051'></script>
+    
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    
+    <script src="https://alwingulla.com/8_8_6/pfe/current/tag.min.js" data-zone="9745051" data-sdk="show_9745051" async></script>
+    
     <style>
         :root {
             --bg-color: #0f172a;
@@ -108,7 +112,6 @@
             padding-left: 8px;
         }
 
-        /* 🌟 স্ক্রিনশটের মতো রো (Row) লেআউট */
         .tasks-stack {
             display: flex;
             flex-direction: column;
@@ -411,30 +414,32 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, setDoc, addDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // ⚠️ আপনার ফায়ারবেস কনফিগারেশন এখানে বসাবেন
         const firebaseConfig = {
-  apiKey: "AIzaSyDLEr3ulwZgDhb-oJF1h8cG87MAdPeHrLA",
-  authDomain: "premium-viral-links.firebaseapp.com",
-  databaseURL: "https://premium-viral-links-default-rtdb.firebaseio.com",
-  projectId: "premium-viral-links",
-  storageBucket: "premium-viral-links.firebasestorage.app",
-  messagingSenderId: "283291795982",
-  appId: "1:283291795982:web:8c534bab5cdb6db571f25f"
-};
+            apiKey: "AIzaSyDLEr3ulwZgDhb-oJF1h8cG87MAdPeHrLA",
+            authDomain: "premium-viral-links.firebaseapp.com",
+            databaseURL: "https://premium-viral-links-default-rtdb.firebaseio.com",
+            projectId: "premium-viral-links",
+            storageBucket: "premium-viral-links.firebasestorage.app",
+            messagingSenderId: "283291795982",
+            appId: "1:283291795982:web:8c534bab5cdb6db571f25f"
+        };
         
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // ⚠️ বটের ইউজারনেম (@ ছাড়া)
         const BOT_USERNAME = "Premium_Viral_Links_bot"; 
 
         let timerDuration = 10;
         let directAdUrl = ""; 
+        
+        // 🌟 নতুন ভ্যারিয়েবল যা এডমিন প্যানেলের আইডি রিসিভ করবে
+        let adsgramBlockId = "";
+        let monetagZoneId = "";
+        
         let allFilesData = [];
         let calculatedBalance = 0;
         let userId = "";
 
-        // ১ ঘণ্টার লক স্টোরেজ হেল্পার ফাংশন
         function getFileData(fileId) {
             let key = `file_ad_data_${fileId}`;
             let stored = localStorage.getItem(key);
@@ -442,7 +447,6 @@
             
             try {
                 let parsed = JSON.parse(stored);
-                // ১ ঘণ্টা = ৩৬০০০০০ মিলিসেকেন্ড পার হলে ডাটা রিসেট
                 if (parsed.unlockTime && (Date.now() - parsed.unlockTime > 3600000)) {
                     localStorage.removeItem(key);
                     return { count: 0, unlockTime: null };
@@ -561,31 +565,26 @@
                 calculatedBalance = totalRefs * 20;
                 document.getElementById('user-balance-display').textContent = calculatedBalance.toFixed(2);
                 
-                // ১. রেফারেল স্ট্যাটাস
                 const refStatusEl = document.getElementById('req-refer-status');
                 refStatusEl.textContent = `${totalRefs} টি সফল রেফার`;
                 let isRefOk = totalRefs >= 1;
                 refStatusEl.className = isRefOk ? "status-badge status-success" : "status-badge status-pending";
 
-                // ২. ব্যালেন্স স্ট্যাটাস
                 const balStatusEl = document.getElementById('req-balance-status');
                 balStatusEl.textContent = `৳${calculatedBalance}/৳২০০`;
                 let isBalOk = calculatedBalance >= 200;
                 balStatusEl.className = isBalOk ? "status-badge status-success" : "status-badge status-pending";
 
-                // ৩. ডেইলি লগইন স্ট্যাটাস (৭ দিন)
                 const loginStatusEl = document.getElementById('req-login-status');
                 loginStatusEl.textContent = `${dailyLoginsCount}/৭ দিন`;
                 let isLoginOk = dailyLoginsCount >= 7;
                 loginStatusEl.className = isLoginOk ? "status-badge status-success" : "status-badge status-pending";
 
-                // ৪. প্রতিদিন ভিডিও আনলক স্ট্যাটাস (৫টি)
                 const unlockStatusEl = document.getElementById('req-unlock-status');
                 unlockStatusEl.textContent = `${todayUnlocks}/৫টি`;
                 let isUnlockOk = todayUnlocks >= 5;
                 unlockStatusEl.className = isUnlockOk ? "status-badge status-success" : "status-badge status-pending";
 
-                // সব রিকোয়ারমেন্ট চেক
                 if (isRefOk && isBalOk && isLoginOk && isUnlockOk) {
                     const btn = document.getElementById('withdraw-submit-btn');
                     btn.classList.remove('btn-disabled');
@@ -664,10 +663,14 @@
         }
 
         async function loadAppData() {
+            // 🌟 ফায়ারবেস থেকে লাইভ অ্যাড নেটওয়ার্ক আইডি এবং কনফিগ লোড করা হচ্ছে
             const timerDoc = await getDoc(doc(db, "settings", "general"));
             if (timerDoc.exists()) {
                 timerDuration = timerDoc.data().timerDuration || 10;
                 directAdUrl = timerDoc.data().directAdUrl || ""; 
+                adsgramBlockId = timerDoc.data().adsgramBlockId || "";
+                monetagZoneId = timerDoc.data().monetagZoneId || "";
+                console.log("Realtime Ad System Loaded: ", { adsgramBlockId, monetagZoneId, timerDuration });
             }
 
             const adsDoc = await getDoc(doc(db, "settings", "ads"));
@@ -684,7 +687,6 @@
             renderFilesGrid(allFilesData, 'files-grid');
         }
 
-        // 🌟 স্ক্রিনশটের অনুকরণে রো ভিত্তিক গ্রিড মেকার
         function renderFilesGrid(files, elementId) {
             const grid = document.getElementById(elementId);
             grid.innerHTML = '';
@@ -731,6 +733,7 @@
             document.getElementById('no-results').style.display = filtered.length === 0 ? 'block' : 'none';
         }
 
+        // 🌟 আপগ্রেডেড রিয়েল লাইভ অ্যাড শো ও লকিং মেকানিজম
         async function handleUnlockClick(e) {
             const btn = e.target.closest('.unlock-btn');
             if (!btn) return;
@@ -740,76 +743,125 @@
             if (!file) return;
 
             btn.classList.add('btn-disabled');
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Load Ad`;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading Ad...`;
 
+            // ফাংশন যা অ্যাড সফলভাবে প্লে হওয়ার পর রান হবে
+            const triggerPointsCounting = () => {
+                let countdown = timerDuration;
+                btn.innerHTML = `<i class="fas fa-clock"></i> Wait ${countdown}s`;
+                
+                const interval = setInterval(async () => {
+                    countdown--;
+                    if (countdown > 0) {
+                        btn.innerHTML = `<i class="fas fa-clock"></i> Wait ${countdown}s`;
+                    } else {
+                        clearInterval(interval);
+                        
+                        let adData = getFileData(file.id);
+                        let currentCount = adData.count + 1;
+                        const required = file.requiredAds || 1;
+
+                        let unlockTime = null;
+                        if (currentCount >= required) {
+                            unlockTime = Date.now();
+                        }
+                        
+                        setFileData(file.id, currentCount, unlockTime);
+                        const allSameFileButtons = document.querySelectorAll(`.unlock-btn[data-id="${fileId}"]`);
+
+                        if (currentCount >= required) {
+                            allSameFileButtons.forEach(button => {
+                                const container = button.parentElement;
+                                if(container) {
+                                    button.remove();
+                                    const newBtn = document.createElement('button');
+                                    newBtn.className = "app-btn";
+                                    newBtn.style.backgroundColor = "var(--success-color)";
+                                    newBtn.innerHTML = `<i class="fas fa-download"></i> Download`;
+                                    newBtn.onclick = () => window.open(file.downloadUrl, '_blank');
+                                    container.insertBefore(newBtn, container.firstChild);
+                                }
+                            });
+                            
+                            const userDocRef = doc(db, "users", userId);
+                            let freshUserDoc = await getDoc(userDocRef);
+                            let today = new Date().toDateString();
+                            
+                            if(freshUserDoc.exists()) {
+                                let uData = freshUserDoc.data();
+                                let totalUnlocks = (uData.videoUnlocks || 0) + 1;
+                                let tUnlocksCount = uData.lastUnlockDate === today ? (uData.todayUnlocksCount || 0) + 1 : 1;
+                                
+                                await setDoc(userDocRef, { 
+                                    videoUnlocks: totalUnlocks,
+                                    todayUnlocksCount: tUnlocksCount,
+                                    lastUnlockDate: today
+                                }, { merge: true });
+                            }
+                            loadUserStats();
+                            showCustomToast("ভিডিওটি সম্পূর্ণ আনলক হয়েছে! 🍿");
+                        } else {
+                            allSameFileButtons.forEach(button => {
+                                button.classList.remove('btn-disabled');
+                                button.innerHTML = `<i class="fas fa-lock"></i> Unlock (${currentCount}/${required})`;
+                            });
+                        }
+                    }
+                }, 1000);
+            };
+
+            // 👑 [১] Adsgram.ai চেক ও রান করা (সবচেয়ে প্রিমিয়াম অপশন)
+            if (adsgramBlockId && adsgramBlockId.trim() !== "") {
+                if (window.Adsgram) {
+                    const AdController = window.Adsgram.init({ blockId: adsgramBlockId });
+                    AdController.show().then((result) => {
+                        showCustomToast("অ্যাড দেখা সফল হয়েছে!");
+                        triggerPointsCounting();
+                    }).catch((err) => {
+                        alert("অ্যাডটি সম্পূর্ণ লোড বা দেখা হয়নি। আবার চেষ্টা করুন।");
+                        btn.classList.remove('btn-disabled');
+                        btn.innerHTML = `<i class="fas fa-lock"></i> Unlock`;
+                    });
+                } else {
+                    // Adsgram স্ক্রিপ্ট লোড না হলে পপআপ ব্যাকআপ
+                    runBackupRedirectAd(triggerPointsCounting, btn);
+                }
+            } 
+            // 💎 [২] Monetag.com চেক ও রান করা (ইন্টারস্টিশিয়াল জোন)
+            else if (monetagZoneId && monetagZoneId.trim() !== "") {
+                const nativeShowFn = `show_${monetagZoneId}`;
+                if (typeof window[nativeShowFn] === 'function') {
+                    window[nativeShowFn]().then(() => {
+                        triggerPointsCounting();
+                    }).catch(() => {
+                        triggerPointsCounting(); // মনিট্যাগের সেফ পাস লজিক
+                    });
+                } else if (typeof window['show_9745051'] === 'function') {
+                    // আপনার স্ক্রিপ্ট ট্যাগে ডিফল্ট আইডি দেওয়া থাকলে
+                    window['show_9745051']().then(() => {
+                        triggerPointsCounting();
+                    }).catch(() => {
+                        triggerPointsCounting();
+                    });
+                } else {
+                    runBackupRedirectAd(triggerPointsCounting, btn);
+                }
+            } 
+            // 🛑 [৩] ব্যাকআপ ডিরেক্ট লিংক (Adsterra/Other Direct Links)
+            else {
+                runBackupRedirectAd(triggerPointsCounting, btn);
+            }
+        }
+
+        // ব্যাকআপ পপআপ রিডাইরেক্ট ফাংশন
+        function runBackupRedirectAd(successCallback, btnInstance) {
             if (directAdUrl && directAdUrl.trim() !== "") {
                 window.open(directAdUrl, '_blank');
+                successCallback();
             } else {
                 window.open('https://www.google.com', '_blank'); 
+                successCallback();
             }
-
-            let countdown = timerDuration;
-            btn.innerHTML = `<i class="fas fa-clock"></i> Wait ${countdown}s`;
-            
-            const interval = setInterval(async () => {
-                countdown--;
-                if (countdown > 0) {
-                    btn.innerHTML = `<i class="fas fa-clock"></i> Wait ${countdown}s`;
-                } else {
-                    clearInterval(interval);
-                    
-                    let adData = getFileData(file.id);
-                    let currentCount = adData.count + 1;
-                    const required = file.requiredAds || 1;
-
-                    let unlockTime = null;
-                    if (currentCount >= required) {
-                        unlockTime = Date.now();
-                    }
-                    
-                    setFileData(file.id, currentCount, unlockTime);
-                    const allSameFileButtons = document.querySelectorAll(`.unlock-btn[data-id="${fileId}"]`);
-
-                    if (currentCount >= required) {
-                        allSameFileButtons.forEach(button => {
-                            // বাটন ইন্টারফেস সাথে সাথে আপডেট
-                            const container = button.parentElement;
-                            if(container) {
-                                button.remove();
-                                const newBtn = document.createElement('button');
-                                newBtn.className = "app-btn";
-                                newBtn.style.backgroundColor = "var(--success-color)";
-                                newBtn.innerHTML = `<i class="fas fa-download"></i> Download`;
-                                newBtn.onclick = () => window.open(file.downloadUrl, '_blank');
-                                container.insertBefore(newBtn, container.firstChild);
-                            }
-                        });
-                        
-                        // ফায়ারবেস ডেটাতে ডেইলি টাস্ক কাউন্ট আপডেট
-                        const userDocRef = doc(db, "users", userId);
-                        let freshUserDoc = await getDoc(userDocRef);
-                        let today = new Date().toDateString();
-                        
-                        if(freshUserDoc.exists()) {
-                            let uData = freshUserDoc.data();
-                            let totalUnlocks = (uData.videoUnlocks || 0) + 1;
-                            let tUnlocksCount = uData.lastUnlockDate === today ? (uData.todayUnlocksCount || 0) + 1 : 1;
-                            
-                            await setDoc(userDocRef, { 
-                                videoUnlocks: totalUnlocks,
-                                todayUnlocksCount: tUnlocksCount,
-                                lastUnlockDate: today
-                            }, { merge: true });
-                        }
-                        loadUserStats();
-                    } else {
-                        allSameFileButtons.forEach(button => {
-                            button.classList.remove('btn-disabled');
-                            button.innerHTML = `<i class="fas fa-lock"></i> Unlock (${currentCount}/${required})`;
-                        });
-                    }
-                }
-            }, 1000);
         }
 
         window.addEventListener('load', () => {
