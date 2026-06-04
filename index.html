@@ -358,19 +358,20 @@
         import { getFirestore, collection, getDocs, doc, getDoc, setDoc, addDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyAsExampleKey-YOUR_ACTUAL_KEY_HERE",
-            authDomain: "admin-panel-demo.firebaseapp.com",
-            projectId: "admin-panel-demo",
-            storageBucket: "admin-panel-demo.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:a1b2c3d4e5f6g7h8i9j0k"
-        };
+  apiKey: "AIzaSyDLEr3ulwZgDhb-oJF1h8cG87MAdPeHrLA",
+  authDomain: "premium-viral-links.firebaseapp.com",
+  databaseURL: "https://premium-viral-links-default-rtdb.firebaseio.com",
+  projectId: "premium-viral-links",
+  storageBucket: "premium-viral-links.firebasestorage.app",
+  messagingSenderId: "283291795982",
+  appId: "1:283291795982:web:50d17b00baa84d6271f25f"
+};
         
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         // আপনার বটের ইউজারনেম এখানে দিন (Username-এর আগে @ দেওয়ার প্রয়োজন নেই)
-        const BOT_USERNAME = "YOUR_BOT_USERNAME"; 
+        const BOT_USERNAME = "Premium_Viral_Links_bot"; 
 
         let timerDuration = 10;
         let directAdUrl = ""; 
