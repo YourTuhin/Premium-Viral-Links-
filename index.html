@@ -412,7 +412,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, addDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // 🌟 ফায়ারবেস ইম্পোর্টে live snapshot ট্র্যাকিং এর জন্য onSnapshot যুক্ত করা হয়েছে
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, addDoc, query, orderBy, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDLEr3ulwZgDhb-oJF1h8cG87MAdPeHrLA",
@@ -431,8 +432,6 @@
 
         let timerDuration = 10;
         let directAdUrl = ""; 
-        
-        // 🌟 নতুন ভ্যারিয়েবল যা এডমিন প্যানেলের আইডি রিসিভ করবে
         let adsgramBlockId = "";
         let monetagZoneId = "";
         
@@ -662,29 +661,42 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
-        async function loadAppData() {
-            // 🌟 ফায়ারবেস থেকে লাইভ অ্যাড নেটওয়ার্ক আইডি এবং কনফিগ লোড করা হচ্ছে
-            const timerDoc = await getDoc(doc(db, "settings", "general"));
-            if (timerDoc.exists()) {
-                timerDuration = timerDoc.data().timerDuration || 10;
-                directAdUrl = timerDoc.data().directAdUrl || ""; 
-                adsgramBlockId = timerDoc.data().adsgramBlockId || "";
-                monetagZoneId = timerDoc.data().monetagZoneId || "";
-                console.log("Realtime Ad System Loaded: ", { adsgramBlockId, monetagZoneId, timerDuration });
-            }
+        // 🔄 রিয়েলটাইম অন-স্ম্যাপশট ডাটা সিঙ্ক ফাংশন (রিফ্রেশ ছাড়া লাইভ পোস্ট যুক্ত হবে)
+        function loadAppData() {
+            // ১. সেটিংস ও আইডি লাইভ ট্র্যাকিং
+            onSnapshot(doc(db, "settings", "general"), (timerDoc) => {
+                if (timerDoc.exists()) {
+                    timerDuration = timerDoc.data().timerDuration || 10;
+                    directAdUrl = timerDoc.data().directAdUrl || ""; 
+                    adsgramBlockId = timerDoc.data().adsgramBlockId || "";
+                    monetagZoneId = timerDoc.data().monetagZoneId || "";
+                    console.log("Realtime Ads ID Synced");
+                }
+            });
 
-            const adsDoc = await getDoc(doc(db, "settings", "ads"));
-            if (adsDoc.exists() && adsDoc.data().adSlot1) {
-                document.getElementById('ad-container-homepage').innerHTML = adsDoc.data().adSlot1;
-            }
+            // ২. হোমপেজ ব্যানার অ্যাড কোড লাইভ ট্র্যাকিং
+            onSnapshot(doc(db, "settings", "ads"), (adsDoc) => {
+                if (adsDoc.exists() && adsDoc.data().adSlot1) {
+                    document.getElementById('ad-container-homepage').innerHTML = adsDoc.data().adSlot1;
+                }
+            });
 
+            // ৩. লাইভ ফাইল/পোস্ট ট্র্যাকিং (এডমিন প্যানেলে পোস্ট করার সাথে সাথে এখানে রিফ্রেশ ছাড়াই শো করবে)
             const filesQuery = query(collection(db, "files"), orderBy("createdAt", "desc"));
-            const snap = await getDocs(filesQuery);
-            allFilesData = [];
-            snap.forEach(d => allFilesData.push({ id: d.id, ...d.data() }));
+            onSnapshot(filesQuery, (snap) => {
+                allFilesData = [];
+                snap.forEach(d => allFilesData.push({ id: d.id, ...d.data() }));
 
-            renderFilesGrid(allFilesData.slice(0, 5), 'latest-uploads-grid');
-            renderFilesGrid(allFilesData, 'files-grid');
+                // লাইভ গ্রিড রেন্ডার
+                renderFilesGrid(allFilesData.slice(0, 5), 'latest-uploads-grid');
+                renderFilesGrid(allFilesData, 'files-grid');
+                
+                // সার্চ বক্স অ্যাক্টিভ থাকলে সার্চ রেজাল্টও রিয়েলটাইম আপডেট হবে
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput && searchInput.value.trim() !== "") {
+                    handleSearch();
+                }
+            });
         }
 
         function renderFilesGrid(files, elementId) {
@@ -823,7 +835,6 @@
                         btn.innerHTML = `<i class="fas fa-lock"></i> Unlock`;
                     });
                 } else {
-                    // Adsgram স্ক্রিপ্ট লোড না হলে পপআপ ব্যাকআপ
                     runBackupRedirectAd(triggerPointsCounting, btn);
                 }
             } 
@@ -837,7 +848,6 @@
                         triggerPointsCounting(); // মনিট্যাগের সেফ পাস লজিক
                     });
                 } else if (typeof window['show_9745051'] === 'function') {
-                    // আপনার স্ক্রিপ্ট ট্যাগে ডিফল্ট আইডি দেওয়া থাকলে
                     window['show_9745051']().then(() => {
                         triggerPointsCounting();
                     }).catch(() => {
@@ -847,7 +857,7 @@
                     runBackupRedirectAd(triggerPointsCounting, btn);
                 }
             } 
-            // 🛑 [৩] ব্যাকআপ ডিরেক্ট লিংক (Adsterra/Other Direct Links)
+            // 🛑 [৩] ব্যাকআপ ডিরেক্ট লিংক (Adsterra Direct Link)
             else {
                 runBackupRedirectAd(triggerPointsCounting, btn);
             }
