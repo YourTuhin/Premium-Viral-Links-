@@ -8,7 +8,7 @@
     
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
-    <script src="https://alwingulla.com/8_8_6/pfe/current/tag.min.js" data-zone="11103376" data-sdk="show_11103376" async></script>
+<script id="monetag-sdk" async></script>
     
     <style>
         :root {
@@ -812,30 +812,46 @@
                 }
             } 
             else if (monetagZoneId && monetagZoneId.trim() !== "") {
-    const nativeShowFn = `show_${monetagZoneId.trim()}`;
+    const zone = monetagZoneId.trim();
+    const nativeShowFn = `show_${zone}`;
     
-    // ১. এডমিন প্যানেল থেকে দেওয়া Zone ID-র ফাংশনটি ব্রাউজারে থাকলে সেটি রান করবে
+    // যদি ওই জোনের স্ক্রিপ্ট অলরেডি লোড হয়ে থাকে, তবে সরাসরি অ্যাড দেখাবে
     if (typeof window[nativeShowFn] === 'function') {
         window[nativeShowFn]().then(() => {
             triggerPointsCounting();
         }).catch(() => {
             triggerPointsCounting(); 
         });
-    } 
-    // ২. যদি এডমিন প্যানেলের আইডি কাজ না করে, তবে ব্যাকআপ হিসেবে স্ক্রিপ্টের হার্ডকোডেড ফাংশনটি চেক করবে
-    else if (typeof window['show_9745051'] === 'function') {
-        window['show_9745051']().then(() => {
-            triggerPointsCounting();
-        }).catch(() => {
-            triggerPointsCounting();
-        });
-    } 
-    // ৩. কোনো ফাংশনই খুঁজে না পেলে Adsterra Direct Link বা Google-এ রিডাইরেক্ট করবে
-    else {
-        runBackupRedirectAd(triggerPointsCounting, btn);
+    } else {
+        // যদি স্ক্রিপ্ট লোড না থাকে, তবে ডাইনামিক্যালি এডমিন প্যানেলের জোন আইডি দিয়ে স্ক্রিপ্ট তৈরি করবে
+        const sdkTag = document.getElementById('monetag-sdk');
+        if (sdkTag && !sdkTag.src) {
+            sdkTag.setAttribute('data-zone', zone);
+            sdkTag.setAttribute('data-sdk', nativeShowFn);
+            sdkTag.src = `https://alwingulla.com/8_8_6/pfe/current/tag.min.js`;
+            
+            // স্ক্রিপ্টটি লোড হওয়া মাত্রই অ্যাড রান করবে
+            sdkTag.onload = function() {
+                if (typeof window[nativeShowFn] === 'function') {
+                    window[nativeShowFn]().then(() => triggerPointsCounting()).catch(() => triggerPointsCounting());
+                } else {
+                    runBackupRedirectAd(triggerPointsCounting, btn);
+                }
+            };
+            sdkTag.onerror = function() {
+                runBackupRedirectAd(triggerPointsCounting, btn);
+            };
+        } else {
+            // যদি কোনো কারণে ফেল্ড হয়, তবে ব্যাকআপ রিডাইরেক্ট অ্যাড চালু হবে
+            runBackupRedirectAd(triggerPointsCounting, btn);
+        }
     }
 }
-
+ 
+            else {
+                runBackupRedirectAd(triggerPointsCounting, btn);
+            }
+        }
 
         function runBackupRedirectAd(successCallback, btnInstance) {
             if (directAdUrl && directAdUrl.trim() !== "") {
