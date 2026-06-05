@@ -8,6 +8,8 @@
     
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
+    <script src="https://alwingulla.com/8_8_6/pfe/current/tag.min.js" data-zone="9745051" data-sdk="show_9745051" async></script>
+    
     <style>
         :root {
             --bg-color: #0f172a;
@@ -252,16 +254,6 @@
             margin-bottom: 8px;
         }
 
-        .ad-box {
-            background: var(--surface-color);
-            border: 1px dashed #334155;
-            border-radius: var(--border-radius);
-            padding: 8px;
-            margin: 12px 0;
-            text-align: center;
-            min-height: 50px;
-        }
-
         .earn-card {
             background: var(--surface-color);
             border: 1px solid #334155;
@@ -321,8 +313,6 @@
                     <p>Ads দেখে ভিডিও আনলক করুন এবং ভিডিওর আসল মজা নিন!</p>
                 </div>
             </header>
-
-            <div id="ad-container-homepage" class="ad-box"></div>
 
             <div class="section-header">Latest Uploads</div>
             <div id="latest-uploads-grid" class="tasks-stack"></div>
@@ -659,40 +649,17 @@
         }
 
         function loadAppData() {
-            // 🔄 রিয়েলটাইম এডমিন সেটিংস লিসেনার (১০০% ডাইনামিক মনিট্যাগ স্ক্রিপ্ট জেনারেটর)
             onSnapshot(doc(db, "settings", "general"), (timerDoc) => {
                 if (timerDoc.exists()) {
                     timerDuration = timerDoc.data().timerDuration || 10;
                     directAdUrl = timerDoc.data().directAdUrl || ""; 
                     adsgramBlockId = timerDoc.data().adsgramBlockId || "";
-                    
-                    const newZoneId = timerDoc.data().monetagZoneId ? String(timerDoc.data().monetagZoneId).trim() : "";
-                    
-                    if (newZoneId && newZoneId !== monetagZoneId) {
-                        monetagZoneId = newZoneId;
-                        
-                        // পুরনো কোনো স্ক্রিপ্ট ব্রাউজারে রেন্ডার হয়ে থাকলে তা মুছে দাও
-                        const oldScript = document.getElementById('dynamic-monetag-script');
-                        if (oldScript) oldScript.remove();
-                        
-                        // রানটাইমে নতুন লাইভ জোন আইডির অফিশিয়াল SDK স্ক্রিপ্ট তৈরি করো
-                        const script = document.createElement('script');
-                        script.id = 'dynamic-monetag-script';
-                        script.src = "https://alwingulla.com/8_8_6/pfe/current/tag.min.js";
-                        script.dataset.zone = monetagZoneId;
-                        script.dataset.sdk = `show_${monetagZoneId}`;
-                        script.async = true;
-                        document.head.appendChild(script);
-                        console.log("Monetag Live SDK Initialized for Zone:", monetagZoneId);
-                    }
+                    monetagZoneId = timerDoc.data().monetagZoneId || "";
+                    console.log("Realtime Ads ID Synced");
                 }
             });
 
-            onSnapshot(doc(db, "settings", "ads"), (adsDoc) => {
-                if (adsDoc.exists() && adsDoc.data().adSlot1) {
-                    document.getElementById('ad-container-homepage').innerHTML = adsDoc.data().adSlot1;
-                }
-            });
+            // 🔄 ব্যানার অ্যাড কোড ট্র্যাকিং মেকানিজমটি এখান থেকে রিমুভ করা হয়েছে
 
             const filesQuery = query(collection(db, "files"), orderBy("createdAt", "desc"));
             onSnapshot(filesQuery, (snap) => {
@@ -830,7 +797,6 @@
                 }, 1000);
             };
 
-            // 👑 [১] Adsgram.ai চেক ও রান করা
             if (adsgramBlockId && adsgramBlockId.trim() !== "") {
                 if (window.Adsgram) {
                     const AdController = window.Adsgram.init({ blockId: adsgramBlockId });
@@ -846,25 +812,24 @@
                     runBackupRedirectAd(triggerPointsCounting, btn);
                 }
             } 
-            // 💎 [২] Monetag OnClick (Popunder) লাইভ ও সম্পূর্ণ ডাইনামিক মোড ট্রিগার
             else if (monetagZoneId && monetagZoneId.trim() !== "") {
                 const nativeShowFn = `show_${monetagZoneId}`;
-                
-                // যদি মনিট্যাগের ডাইনামিক ফাংশন ব্রাউজার মেমরিতে রেডি থাকে
                 if (typeof window[nativeShowFn] === 'function') {
                     window[nativeShowFn]().then(() => {
-                        showCustomToast("অ্যাড ট্রিক সফল!");
                         triggerPointsCounting();
                     }).catch(() => {
-                        // সেফ মোড পাস লজিক
+                        triggerPointsCounting(); 
+                    });
+                } else if (typeof window['show_9745051'] === 'function') {
+                    window['show_9745051']().then(() => {
+                        triggerPointsCounting();
+                    }).catch(() => {
                         triggerPointsCounting();
                     });
                 } else {
-                    // স্ক্রিপ্ট মেমরিতে লোড হতে দেরি হলে বা ব্লক হলে ব্যাকআপ পপআপ রান করো
                     runBackupRedirectAd(triggerPointsCounting, btn);
                 }
             } 
-            // 🛑 [৩] ব্যাকআপ ডিরেক্ট লিংক (Adsterra Direct Link)
             else {
                 runBackupRedirectAd(triggerPointsCounting, btn);
             }
