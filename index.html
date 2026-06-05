@@ -812,27 +812,30 @@
                 }
             } 
             else if (monetagZoneId && monetagZoneId.trim() !== "") {
-                const nativeShowFn = `show_${monetagZoneId}`;
-                if (typeof window[nativeShowFn] === 'function') {
-                    window[nativeShowFn]().then(() => {
-                        triggerPointsCounting();
-                    }).catch(() => {
-                        triggerPointsCounting(); 
-                    });
-                } else if (typeof window['show_9745051'] === 'function') {
-                    window['show_9745051']().then(() => {
-                        triggerPointsCounting();
-                    }).catch(() => {
-                        triggerPointsCounting();
-                    });
-                } else {
-                    runBackupRedirectAd(triggerPointsCounting, btn);
-                }
-            } 
-            else {
-                runBackupRedirectAd(triggerPointsCounting, btn);
-            }
-        }
+    const nativeShowFn = `show_${monetagZoneId.trim()}`;
+    
+    // ১. এডমিন প্যানেল থেকে দেওয়া Zone ID-র ফাংশনটি ব্রাউজারে থাকলে সেটি রান করবে
+    if (typeof window[nativeShowFn] === 'function') {
+        window[nativeShowFn]().then(() => {
+            triggerPointsCounting();
+        }).catch(() => {
+            triggerPointsCounting(); 
+        });
+    } 
+    // ২. যদি এডমিন প্যানেলের আইডি কাজ না করে, তবে ব্যাকআপ হিসেবে স্ক্রিপ্টের হার্ডকোডেড ফাংশনটি চেক করবে
+    else if (typeof window['show_9745051'] === 'function') {
+        window['show_9745051']().then(() => {
+            triggerPointsCounting();
+        }).catch(() => {
+            triggerPointsCounting();
+        });
+    } 
+    // ৩. কোনো ফাংশনই খুঁজে না পেলে Adsterra Direct Link বা Google-এ রিডাইরেক্ট করবে
+    else {
+        runBackupRedirectAd(triggerPointsCounting, btn);
+    }
+}
+
 
         function runBackupRedirectAd(successCallback, btnInstance) {
             if (directAdUrl && directAdUrl.trim() !== "") {
